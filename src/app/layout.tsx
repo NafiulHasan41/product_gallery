@@ -33,7 +33,10 @@ export default function RootLayout({
       >
        <Providers>
          <NavBar/>
-          {children}
+         <div className=" w-[95%] md:w-[80%] mx-auto">
+         {children}
+         </div>
+          
         </Providers>
 
       </body>

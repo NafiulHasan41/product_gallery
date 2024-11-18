@@ -1,32 +1,62 @@
 'use client'
-import React from 'react'
-import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Input, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar} from "@nextui-org/react";
+import React, { useEffect, useState } from 'react'
+import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Input, DropdownItem , Dropdown, DropdownMenu} from "@nextui-org/react";
 import {SearchIcon} from "./SearchIcon.jsx";
 
 export default function NavBar() {
+   
+   const [searchData, setSearchData] = useState();
+   const [searchValue, setSearchValue] = useState();
+  //  console.log("Search value",searchData) ;
+  //  console.log("Search value2",searchData?.length ) ;
+
+   useEffect(  () =>{
+       
+    const fetchData = async () => {
+      if(searchValue?.length > 0)
+      {
+        const data = await fetch(`https://dummyjson.com/products/search?q=${searchValue}`);
+        const response = await data.json();
+        setSearchData(response.products);
+        // console.log(" Inside use effect", response.products);
+
+      }
+      else
+      {
+        setSearchData('');
+      }
+      
+
+    }
+
+    fetchData();
+
+     
+     
+
+   }, [searchValue])
+
   return (
   
          <Navbar isBordered>
       <NavbarContent justify="start">
         <NavbarBrand className="mr-4">
-          <p className="hidden sm:block font-bold text-inherit">ACME</p>
+            <Link color="foreground" href="/">
+              Products
+            </Link>
         </NavbarBrand>
         <NavbarContent className="hidden sm:flex gap-3">
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Features
+          <NavbarItem  isActive >
+            <Link color="foreground" href="/">
+              Home
             </Link>
           </NavbarItem>
-          <NavbarItem isActive>
+          <NavbarItem >
             <Link href="#" aria-current="page" color="secondary">
-              Customers
+              About Us
             </Link>
           </NavbarItem>
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Integrations
-            </Link>
-          </NavbarItem>
+
         </NavbarContent>
       </NavbarContent>
 
@@ -42,35 +72,33 @@ export default function NavBar() {
           size="sm"
           startContent={<SearchIcon size={18} />}
           type="search"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
         />
-        <Dropdown placement="bottom-end">
-          <DropdownTrigger>
-            <Avatar
-              isBordered
-              as="button"
-              className="transition-transform"
-              color="secondary"
-              name="Jason Hughes"
-              size="sm"
-              src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-            />
-          </DropdownTrigger>
-          <DropdownMenu aria-label="Profile Actions" variant="flat">
-            <DropdownItem key="profile" className="h-14 gap-2">
-              <p className="font-semibold">Signed in as</p>
-              <p className="font-semibold">zoey@example.com</p>
-            </DropdownItem>
-            <DropdownItem key="settings">My Settings</DropdownItem>
-            <DropdownItem key="team_settings">Team Settings</DropdownItem>
-            <DropdownItem key="analytics">Analytics</DropdownItem>
-            <DropdownItem key="system">System</DropdownItem>
-            <DropdownItem key="configurations">Configurations</DropdownItem>
-            <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-            <DropdownItem key="logout" color="danger">
-              Log Out
-            </DropdownItem>
+        <button className=" py-1 px-4 bg-sky-300 rounded-lg text-[14px] ">Search</button>
+        <>
+         {
+          searchData?.length > 0 && <Dropdown className=' absolute top-8 right-0' >
+            
+          <DropdownMenu aria-label="Profile Actions" variant="flat" className='max-h-[200px] md:max-h-[300px] overflow-auto'>
+            {
+              searchData.map((item) => {
+                return (
+                  <DropdownItem key={item.id} className="border-b py-1">
+                    <Link href={`/product_details/${item.id}`} className="block w-full h-full text-gray-800 hover:text-blue-500">
+                      {item.title}
+                    </Link>
+                  </DropdownItem>
+                )
+              })
+            }
+      
+          
+           
           </DropdownMenu>
         </Dropdown>
+         }
+        </>
       </NavbarContent>
     </Navbar>
       
